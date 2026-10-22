@@ -1,9 +1,9 @@
-import { setUser } from "./config.js";
-import { db } from "./lib/db/index.js";
+import { setUser, readConfig } from "./config.js";
 import {
   createUser,
   deleteAllUsers,
   getUserByName,
+  getUserNames,
 } from "./lib/db/queries/users.js";
 
 // login as user
@@ -50,4 +50,13 @@ export async function handlerReset(cmdName: string, ...args: string[]) {
   }
 }
 
-// get all users
+// List all users
+export async function handlerUsers(cmdName: string, ...args: string[]) {
+  const userNames = await getUserNames();
+  const currentUser = readConfig().currentUserName;
+  userNames.forEach((user) => {
+    console.log(
+      `* ${user.name} ${user.name === currentUser ? "(current)" : ""}`,
+    );
+  });
+}

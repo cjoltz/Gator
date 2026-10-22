@@ -1,9 +1,15 @@
+import { handlerAgg } from "./aggregator.js";
 import {
   type CommandsRegistry,
   registerCommand,
   runCommand,
 } from "./commands.js";
-import { handlerLogin, handlerRegister, handlerReset } from "./users.js";
+import {
+  handlerLogin,
+  handlerRegister,
+  handlerReset,
+  handlerUsers,
+} from "./users.js";
 
 async function main() {
   // Process user input command and args
@@ -20,6 +26,8 @@ async function main() {
   registerCommand(commands, "login", handlerLogin);
   registerCommand(commands, "register", handlerRegister);
   registerCommand(commands, "reset", handlerReset);
+  registerCommand(commands, "users", handlerUsers);
+  registerCommand(commands, "agg", handlerAgg);
 
   // Run command
   try {
