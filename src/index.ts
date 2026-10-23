@@ -6,6 +6,12 @@ import {
 } from "./commands.js";
 import { handlerAddFeed, handlerFeeds } from "./feeds.js";
 import {
+  handlerFollow,
+  handlerFollowing,
+  handlerUnfollow,
+} from "./feedFollows.js";
+import { middlewareLoggedIn } from "./middleware.js";
+import {
   handlerLogin,
   handlerRegister,
   handlerReset,
@@ -29,8 +35,11 @@ async function main() {
   registerCommand(commands, "reset", handlerReset);
   registerCommand(commands, "users", handlerUsers);
   registerCommand(commands, "agg", handlerAgg);
-  registerCommand(commands, "addfeed", handlerAddFeed);
+  registerCommand(commands, "addfeed", middlewareLoggedIn(handlerAddFeed));
   registerCommand(commands, "feeds", handlerFeeds);
+  registerCommand(commands, "follow", middlewareLoggedIn(handlerFollow));
+  registerCommand(commands, "following", middlewareLoggedIn(handlerFollowing));
+  registerCommand(commands, "unfollow", middlewareLoggedIn(handlerUnfollow));
 
   // Run command
   try {

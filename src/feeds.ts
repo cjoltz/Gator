@@ -3,6 +3,8 @@ import { readConfig } from "./config.js";
 import { createFeed, getFeeds } from "./lib/db/queries/feeds.js";
 import { getUserByName } from "./lib/db/queries/users.js";
 import type { User, Feed } from "./lib/db/schema.js";
+import { createFeedFollow } from "./lib/db/queries/feedFollows.js";
+import { printFeedFollow } from "./feedFollows.js";
 
 export type RSSFeed = {
   channel: {
@@ -20,22 +22,32 @@ export type RSSItem = {
   pubDate: string;
 };
 
-export async function handlerAddFeed(cmdName: string, ...args: string[]) {
+export async function handlerAddFeed(
+  cmdName: string,
+  user: User,
+  ...args: string[]
+) {
   if (args.length !== 2) {
     throw new Error(
       `${cmdName} command expects precisely two arguments: name and url`,
     );
   }
-  const currentUser = await getUserByName(readConfig().currentUserName);
-  if (!currentUser) {
-    throw new Error("Login or register as a user to add a feed");
-  }
+
   const [name, url] = args;
-  const feed: Feed = await createFeed(name, url, currentUser.id);
-  printFeed(feed, currentUser);
+  const feed: Feed = await createFeed(name, url, user.id);
+  if (!feed) {
+    throw new Error("Failed to create feed");
+  }
+
+  const follow = await createFeedFollow(feed.userId, feed.id);
+  printFeedFollow(user.name, feed.name);
+
+  console.log("Feed created succesfully:");
+  printFeed(feed, user);
 }
 
 export async function handlerFeeds(cmdName: string, ...args: string[]) {
+  // lists all feeds in feeds table
   const feeds = await getFeeds();
   feeds.forEach((feed) => {
     console.log(
