@@ -4,6 +4,7 @@ import {
   registerCommand,
   runCommand,
 } from "./commands.js";
+import { handlerAddFeed, handlerFeeds } from "./feeds.js";
 import {
   handlerLogin,
   handlerRegister,
@@ -28,6 +29,8 @@ async function main() {
   registerCommand(commands, "reset", handlerReset);
   registerCommand(commands, "users", handlerUsers);
   registerCommand(commands, "agg", handlerAgg);
+  registerCommand(commands, "addfeed", handlerAddFeed);
+  registerCommand(commands, "feeds", handlerFeeds);
 
   // Run command
   try {

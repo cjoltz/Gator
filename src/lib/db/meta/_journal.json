@@ -8,6 +8,13 @@
       "when": 1792691629897,
       "tag": "0000_motionless_bromley",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1792702416838,
+      "tag": "0001_chilly_nomad",
+      "breakpoints": true
     }
   ]
 }

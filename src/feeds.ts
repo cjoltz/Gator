@@ -1,4 +1,8 @@
 import { XMLParser } from "fast-xml-parser";
+import { readConfig } from "./config.js";
+import { createFeed, getFeeds } from "./lib/db/queries/feeds.js";
+import { getUserByName } from "./lib/db/queries/users.js";
+import type { User, Feed } from "./lib/db/schema.js";
 
 export type RSSFeed = {
   channel: {
@@ -15,6 +19,37 @@ export type RSSItem = {
   description: string;
   pubDate: string;
 };
+
+export async function handlerAddFeed(cmdName: string, ...args: string[]) {
+  if (args.length !== 2) {
+    throw new Error(
+      `${cmdName} command expects precisely two arguments: name and url`,
+    );
+  }
+  const currentUser = await getUserByName(readConfig().currentUserName);
+  if (!currentUser) {
+    throw new Error("Login or register as a user to add a feed");
+  }
+  const [name, url] = args;
+  const feed: Feed = await createFeed(name, url, currentUser.id);
+  printFeed(feed, currentUser);
+}
+
+export async function handlerFeeds(cmdName: string, ...args: string[]) {
+  const feeds = await getFeeds();
+  feeds.forEach((feed) => {
+    console.log(
+      `* Name: ${feed.name}\n* URL: ${feed.url}\n* User: ${feed.userId}\n`,
+    );
+  });
+}
+
+function printFeed(feed: Feed, user: User) {
+  for (const [key, val] of Object.entries(feed)) {
+    console.log(`* ${key}: ${val}`);
+  }
+  console.log(`* Username: ${user.name}`);
+}
 
 export async function fetchFeed(feedURL: string): Promise<RSSFeed> {
   // Fetch feed data
