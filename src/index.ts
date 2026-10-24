@@ -17,6 +17,7 @@ import {
   handlerReset,
   handlerUsers,
 } from "./users.js";
+import { handlerBrowse } from "./posts.js";
 
 async function main() {
   // Process user input command and args
@@ -40,6 +41,7 @@ async function main() {
   registerCommand(commands, "follow", middlewareLoggedIn(handlerFollow));
   registerCommand(commands, "following", middlewareLoggedIn(handlerFollowing));
   registerCommand(commands, "unfollow", middlewareLoggedIn(handlerUnfollow));
+  registerCommand(commands, "browse", middlewareLoggedIn(handlerBrowse));
 
   // Run command
   try {

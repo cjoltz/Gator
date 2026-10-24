@@ -1,5 +1,6 @@
 import { fetchFeed } from "./feeds.js";
 import { getNextFeedtoFetch, markFeedFetched } from "./lib/db/queries/feeds.js";
+import { createPost } from "./lib/db/queries/posts.js";
 
 export async function handlerAgg(cmdName: string, ...args: string[]) {
   if (args.length !== 1) {
@@ -41,9 +42,25 @@ export async function scrapeFeeds() {
   await markFeedFetched(nextFeed.id);
   const fetchedFeed = await fetchFeed(nextFeed.url);
 
-  fetchedFeed.channel.item.forEach((item) => {
-    console.log(item.title);
-  });
+  for (const item of fetchedFeed.channel.item) {
+    // On a bad publication Date, default to current time
+    let date = new Date(item.pubDate);
+    if (isNaN(date.getTime())) {
+      date = new Date();
+    }
+
+    try {
+      await createPost(
+        item.title,
+        item.link,
+        item.description,
+        date,
+        nextFeed.id,
+      );
+    } catch (err) {
+      console.error(`Failed to save post ${item.link}`, err);
+    }
+  }
 }
 
 function parseDuration(durationStr: string): number {

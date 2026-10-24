@@ -1,12 +1,9 @@
-import { url } from "node:inspector";
-import { readConfig } from "./config.js";
 import {
   createFeedFollow,
   getFeedFollowsForUser,
   unfollowFeedByURL,
 } from "./lib/db/queries/feedFollows.js";
 import { getFeedByURL } from "./lib/db/queries/feeds.js";
-import { getUserByName } from "./lib/db/queries/users.js";
 import { User } from "./lib/db/schema.js";
 
 export async function handlerFollow(
@@ -20,6 +17,9 @@ export async function handlerFollow(
   }
   const url = args[0];
   const feed = await getFeedByURL(url);
+  if (!feed) {
+    throw new Error(`Feed ${url} not found`);
+  }
   const result = await createFeedFollow(user.id, feed.id);
   console.log(`User ${result.userName} now follows ${result.feedName}`);
 }
@@ -49,7 +49,7 @@ export async function handlerUnfollow(
   ...args: string[]
 ) {
   if (args.length !== 1) {
-    throw new Error(`usage: ${cmdName} <feedname>`);
+    throw new Error(`usage: ${cmdName} <url>`);
   }
 
   let result = await unfollowFeedByURL(args[0], user.id);

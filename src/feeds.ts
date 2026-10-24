@@ -1,7 +1,5 @@
 import { XMLParser } from "fast-xml-parser";
-import { readConfig } from "./config.js";
 import { createFeed, getFeeds } from "./lib/db/queries/feeds.js";
-import { getUserByName } from "./lib/db/queries/users.js";
 import type { User, Feed } from "./lib/db/schema.js";
 import { createFeedFollow } from "./lib/db/queries/feedFollows.js";
 import { printFeedFollow } from "./feedFollows.js";
@@ -39,7 +37,7 @@ export async function handlerAddFeed(
     throw new Error("Failed to create feed");
   }
 
-  const follow = await createFeedFollow(feed.userId, feed.id);
+  await createFeedFollow(feed.userId, feed.id);
   printFeedFollow(user.name, feed.name);
 
   console.log("Feed created succesfully:");
@@ -51,7 +49,7 @@ export async function handlerFeeds(cmdName: string, ...args: string[]) {
   const feeds = await getFeeds();
   feeds.forEach((feed) => {
     console.log(
-      `* Name: ${feed.name}\n* URL: ${feed.url}\n* User: ${feed.userId}\n`,
+      `* Name: ${feed.name}\n* URL: ${feed.url}\n* User: ${feed.userName}\n`,
     );
   });
 }

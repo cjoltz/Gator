@@ -16,7 +16,7 @@ export async function createFeed(name: string, url: string, userId: string) {
 
 export async function getFeeds() {
   return await db
-    .select({ name: feeds.name, url: feeds.url, userId: users.name })
+    .select({ name: feeds.name, url: feeds.url, userName: users.name })
     .from(feeds)
     .innerJoin(users, eq(feeds.userId, users.id));
 }
